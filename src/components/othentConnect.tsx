@@ -12,6 +12,7 @@ declare global {
     interface Window {
         othentInstalled: boolean;
         othentLoaded: boolean;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         othent: any;
     }
 }
@@ -69,6 +70,7 @@ const OthentConnect = () => {
         }
 
         try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             othent.logOut().then((result: any) => {
                 if (!result) return;
                 setUserDetails(null);
