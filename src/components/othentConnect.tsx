@@ -12,6 +12,7 @@ declare global {
     interface Window {
         othentInstalled: boolean;
         othentLoaded: boolean;
+        initOthent: (params?: { API_ID: string }) => Promise<boolean>;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         othent: any;
     }
@@ -25,7 +26,7 @@ const OthentConnect = () => {
     const [logoutClicked, setLogoutClicked] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
-    const getOthent = () => {
+    const getOthent = async () => {
         const installed = window.othentInstalled;
         console.log('Installed: ', installed);
 
@@ -34,13 +35,20 @@ const OthentConnect = () => {
             return null;
         }
 
+        const loaded = await window.initOthent();
+
+        if (!loaded) {
+            setErrorMessage('Could not initialize Othent Extension, please try again later');
+            return null;
+        }
+
         return window.othent;
     };
 
-    const tryLogin = () => {
+    const tryLogin = async () => {
         setLoginClicked(true);
 
-        const othent = getOthent();
+        const othent = await getOthent();
 
         if (!othent) {
             setLoginClicked(false);
@@ -59,10 +67,10 @@ const OthentConnect = () => {
         }
     };
 
-    const tryLogout = () => {
+    const tryLogout = async () => {
         setLogoutClicked(true);
 
-        const othent = getOthent();
+        const othent = await getOthent();
 
         if (!othent) {
             setLogoutClicked(false);
