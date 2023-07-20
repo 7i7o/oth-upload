@@ -6,7 +6,6 @@
 'use client';
 import { type ChangeEvent, useEffect, useRef, useState } from 'react';
 
-// @ts-expect-error expecting othent object injected from web extension
 const oth = () => window.othent;
 
 type ArweaveUploadProps = {
