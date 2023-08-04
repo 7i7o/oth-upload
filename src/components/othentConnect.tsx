@@ -149,13 +149,13 @@ const OthentConnect = () => {
                         </button>
                     </div>
 
-                    <Uploader
+                    {/* <Uploader
                         errorMessage={errorMessage}
                         buttonName="Upload with Arweave"
                         setErrorMessage={setErrorMessage}
                         functionName1="signTransactionArweave"
                         functionName2="sendTransactionArweave"
-                    />
+                    /> */}
 
                     <Uploader
                         errorMessage={errorMessage}

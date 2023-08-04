@@ -4,9 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 'use client';
-import { type ChangeEvent, useEffect, useRef, useState } from 'react';
-
-const oth = () => window.othent;
+import { type ChangeEvent, useEffect, useRef, useState, type SetStateAction } from 'react';
 
 type ArweaveUploadProps = {
     errorMessage: string;
@@ -17,7 +15,7 @@ type ArweaveUploadProps = {
 };
 
 const Uploader = (props: ArweaveUploadProps) => {
-    const { buttonName, setErrorMessage, functionName1, functionName2 } = props;
+    const { buttonName, setErrorMessage } = props;
 
     const [txId, setTxId] = useState('');
     const [fileName, setFileName] = useState('');
@@ -27,25 +25,31 @@ const Uploader = (props: ArweaveUploadProps) => {
     useEffect(() => {
         if (!file) return;
 
-        const uploadFile = () => {
-            const o = oth();
-            o[functionName1]({
-                othentFunction: 'uploadData',
-                data: file,
-                tags: [{ name: 'Content-Type', value: file.type }]
-            }).then((signedTx: any) => {
-                o[functionName2](signedTx).then((result: any) => {
-                    if (!result.success) setErrorMessage(`${functionName2} failed`);
-                    else {
-                        setTxId(result.transactionId);
-                        setFileName(file.name);
-                    }
-                    setFile(null);
-                });
-            });
-        };
+        file.arrayBuffer()
+            .then((buff) => {
+                const uint8Array = new Uint8Array(buff);
+                window.arweaveWallet
+                    .dispatch({
+                        data: uint8Array,
+                        tags: [
+                            { name: 'Content-Type', value: file.type },
+                            { name: 'File-Name', value: file.name }
+                        ]
+                    })
+                    .then((r: { id: SetStateAction<string> }) => {
+                        if (!r.id) setErrorMessage('No tx id after upload');
+                        else {
+                            setTxId(r.id);
+                            setFileName(file.name);
+                        }
+                    })
+                    .catch((err: any) =>
+                        setErrorMessage(`Could not upload file: ${JSON.stringify(err)}`)
+                    );
+            })
+            .catch((err) => setErrorMessage(`Could not load file: ${JSON.stringify(err)}`));
 
-        uploadFile();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [file]);
 
     const handleChangeFile = (event: ChangeEvent<HTMLInputElement>) => {
