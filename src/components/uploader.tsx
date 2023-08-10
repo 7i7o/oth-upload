@@ -15,7 +15,7 @@ type ArweaveUploadProps = {
 };
 
 const Uploader = (props: ArweaveUploadProps) => {
-    const { buttonName, setErrorMessage } = props;
+    const { buttonName, setErrorMessage, functionName1, functionName2 } = props;
 
     const [txId, setTxId] = useState('');
     const [fileName, setFileName] = useState('');
@@ -25,29 +25,50 @@ const Uploader = (props: ArweaveUploadProps) => {
     useEffect(() => {
         if (!file) return;
 
-        file.arrayBuffer()
-            .then((buff) => {
-                const uint8Array = new Uint8Array(buff);
-                window.arweaveWallet
-                    .dispatch({
-                        data: uint8Array,
-                        tags: [
-                            { name: 'Content-Type', value: file.type },
-                            { name: 'File-Name', value: file.name }
-                        ]
-                    })
-                    .then((r: { id: SetStateAction<string> }) => {
-                        if (!r.id) setErrorMessage('No tx id after upload');
-                        else {
-                            setTxId(r.id);
-                            setFileName(file.name);
-                        }
-                    })
-                    .catch((err: any) =>
-                        setErrorMessage(`Could not upload file: ${JSON.stringify(err)}`)
-                    );
-            })
-            .catch((err) => setErrorMessage(`Could not load file: ${JSON.stringify(err)}`));
+        // file.arrayBuffer()
+        //     .then((buff) => {
+        //         const uint8Array = new Uint8Array(buff);
+        //         window.arweaveWallet
+        //             .dispatch({
+        //                 data: uint8Array,
+        //                 tags: [
+        //                     { name: 'Content-Type', value: file.type },
+        //                     { name: 'File-Name', value: file.name }
+        //                 ]
+        //             })
+        //             .then((r: { id: SetStateAction<string> }) => {
+        //                 if (!r.id) setErrorMessage('No tx id after upload');
+        //                 else {
+        //                     setTxId(r.id);
+        //                     setFileName(file.name);
+        //                 }
+        //             })
+        //             // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        //             .catch((err: any) =>
+        //                 setErrorMessage(`Could not upload file: ${JSON.stringify(err)}`)
+        //             );
+        //     })
+        //     .catch((err) => setErrorMessage(`Could not load file: ${JSON.stringify(err)}`));
+
+        const uploadFile = () => {
+            const o = window.arweaveWallet;
+            o[functionName1]({
+                othentFunction: 'uploadData',
+                data: file,
+                tags: [{ name: 'Content-Type', value: file.type }]
+            }).then((signedTx: any) => {
+                o[functionName2](signedTx).then((result: any) => {
+                    if (!result.success) setErrorMessage(`${functionName2} failed`);
+                    else {
+                        setTxId(result.transactionId);
+                        setFileName(file.name);
+                    }
+                    setFile(null);
+                });
+            });
+        };
+
+        uploadFile();
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [file]);

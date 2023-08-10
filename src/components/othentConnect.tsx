@@ -19,7 +19,7 @@ declare global {
     }
 }
 
-const installOthentMsg = 'Please, Install & Enable Othent Mobile Safari Extension and try again';
+// const installOthentMsg = 'Please, Install & Enable Othent Mobile Safari Extension and try again';
 
 const OthentConnect = () => {
     const [walletLoaded, setWalletLoaded] = useState(false);
