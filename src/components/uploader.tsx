@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 'use client';
-import { type ChangeEvent, useEffect, useRef, useState, type SetStateAction } from 'react';
+import { type ChangeEvent, useEffect, useRef, useState } from 'react';
 
 type ArweaveUploadProps = {
     errorMessage: string;
