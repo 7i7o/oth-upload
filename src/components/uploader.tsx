@@ -50,12 +50,27 @@ const Uploader = (props: ArweaveUploadProps) => {
         //     })
         //     .catch((err) => setErrorMessage(`Could not load file: ${JSON.stringify(err)}`));
 
-        const uploadFile = () => {
+        async function readFileData(file: File): Promise<Buffer> {
+            return new Promise<Buffer>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const fileData = reader.result as ArrayBuffer;
+                    const buffer = Buffer.from(fileData);
+                    resolve(buffer);
+                };
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        const uploadFile = async () => {
             const o = window.arweaveWallet;
+            const fileType = file.type;
+            const data = await readFileData(file);
             o[functionName1]({
                 othentFunction: 'uploadData',
-                data: file,
-                tags: [{ name: 'Content-Type', value: file.type }]
+                data,
+                tags: [{ name: 'Content-Type', value: fileType }]
             }).then((signedTx: any) => {
                 o[functionName2](signedTx).then((result: any) => {
                     if (!result.success) setErrorMessage(`${functionName2} failed`);
@@ -68,7 +83,9 @@ const Uploader = (props: ArweaveUploadProps) => {
             });
         };
 
-        uploadFile();
+        uploadFile()
+            .then()
+            .catch(() => null);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [file]);
