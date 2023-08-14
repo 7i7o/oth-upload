@@ -22,55 +22,59 @@ const Uploader = (props: ArweaveUploadProps) => {
     const [file, setFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const toB64 = (text: string) => Buffer.from(text, 'utf8').toString('base64');
+
     useEffect(() => {
         if (!file) return;
 
         file.arrayBuffer()
             .then((buff) => {
                 const uint8Array = new Uint8Array(buff);
-                // window.arweaveWallet
-                //     .dispatch({
-                //         data: uint8Array,
-                //         tags: [
-                //             { name: 'Content-Type', value: file.type },
-                //             { name: 'File-Name', value: file.name }
-                //         ]
-                //     })
-                //     .then((r: { id: SetStateAction<string> }) => {
-                //         if (!r.id) setErrorMessage('No tx id after upload');
-                //         else {
-                //             setTxId(r.id);
-                //             setFileName(file.name);
-                //         }
-                //     })
-                //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                //     .catch((err: any) =>
-                //         setErrorMessage(`Could not upload file: ${JSON.stringify(err)}`)
-                //     );
-                window.arweaveWallet[functionName1]({
-                    othentFunction: 'uploadData',
-                    data: uint8Array,
-                    tags: [{ name: 'Content-Type', value: file.type }]
-                })
-                    .then((signedTx: any) => {
-                        window.arweaveWallet[functionName2](signedTx)
-                            .then((result: any) => {
-                                if (!result.success) setErrorMessage(`${functionName2} failed`);
-                                else {
-                                    setTxId(result.transactionId);
-                                    setFileName(file.name);
-                                }
-                                setFile(null);
-                            })
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            .catch((err: any) =>
-                                setErrorMessage(`Could not upload file: ${JSON.stringify(err)}`)
-                            );
+                window.arweaveWallet
+                    .dispatch({
+                        data: uint8Array,
+                        tags: [
+                            { name: toB64('Content-Type'), value: toB64(file.type) },
+                            { name: toB64('File-Name'), value: toB64(file.name) }
+                        ],
+                        quantity: '0',
+                        target: ''
+                    })
+                    .then((r: { id: string }) => {
+                        if (!r.id) setErrorMessage('No tx id after upload');
+                        else {
+                            setTxId(r.id);
+                            setFileName(file.name);
+                        }
                     })
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     .catch((err: any) =>
-                        setErrorMessage(`Could not sign file: ${JSON.stringify(err)}`)
+                        setErrorMessage(`Could not upload file: ${JSON.stringify(err)}`)
                     );
+                //     window.arweaveWallet[functionName1]({
+                //         othentFunction: 'uploadData',
+                //         data: uint8Array,
+                //         tags: [{ name: 'Content-Type', value: file.type }]
+                //     })
+                //         .then((signedTx: any) => {
+                //             window.arweaveWallet[functionName2](signedTx)
+                //                 .then((result: any) => {
+                //                     if (!result.success) setErrorMessage(`${functionName2} failed`);
+                //                     else {
+                //                         setTxId(result.transactionId);
+                //                         setFileName(file.name);
+                //                     }
+                //                     setFile(null);
+                //                 })
+                //                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                //                 .catch((err: any) =>
+                //                     setErrorMessage(`Could not upload file: ${JSON.stringify(err)}`)
+                //                 );
+                //         })
+                //         // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                //         .catch((err: any) =>
+                //             setErrorMessage(`Could not sign file: ${JSON.stringify(err)}`)
+                //         );
             })
             .catch((err) => setErrorMessage(`Could not load file: ${JSON.stringify(err)}`));
 
