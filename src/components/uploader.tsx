@@ -15,7 +15,7 @@ type ArweaveUploadProps = {
 };
 
 const Uploader = (props: ArweaveUploadProps) => {
-    const { buttonName, setErrorMessage, functionName1, functionName2 } = props;
+    const { buttonName, setErrorMessage } = props;
 
     const [txId, setTxId] = useState('');
     const [fileName, setFileName] = useState('');
