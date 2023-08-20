@@ -41,15 +41,20 @@ const Uploader = (props: ArweaveUploadProps) => {
                         target: ''
                     })
                     .then((r: { id: string }) => {
-                        if (!r.id) setErrorMessage('No tx id after upload');
+                        if (!r.id) {
+                            console.log('[ oth-upload ] ', r);
+                            setErrorMessage('No tx id after upload');
+                        }
                         else {
                             setTxId(r.id);
                             setFileName(file.name);
                         }
                     })
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    .catch((err: any) =>
+                    .catch((err: any) => {
+                        console.log(err);
                         setErrorMessage(`Could not upload file: ${JSON.stringify(err)}`)
+                    }
                     );
                 //     window.arweaveWallet[functionName1]({
                 //         othentFunction: 'uploadData',
